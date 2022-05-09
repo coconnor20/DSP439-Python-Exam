@@ -1,4 +1,4 @@
-import re
+import unittest
 import pandas as pd
 import sys
 
@@ -7,7 +7,7 @@ def parse_input(path):
     Input Parsing Function
 
     Args: 
-    Path -> Filepath to a textfile containg genetic strings
+    Path(str) -> Filepath to a textfile containg genetic strings
 
     Returns:
     List of Genetic strings
@@ -29,9 +29,9 @@ def get_observed_kmers(k, s):
 
     Args: 
 
-    K -> size of string
+    K(int) -> size of string
 
-    S -> Full String
+    S(str) -> Full String
 
     Returns:
 
@@ -60,9 +60,9 @@ def get_possible_kmers(k, s):
 
     Args: 
 
-    K -> size of string
+    K(int) -> size of string
     
-    S -> Full String
+    S(str) -> Full String
 
     Returns:
     
@@ -74,14 +74,17 @@ def get_possible_kmers(k, s):
     return min((len(s)-k)+1, 4**k)
 
 def calc_linguistic_comp(observed, possible):
-    r'''
+    '''
     Calculates Linguistic Complexity
 
     Args:
-    observed(int) -> sum of observerd kmers \t
+
+    observed(int) -> sum of observerd kmers 
+    
     possible(int) -> sum of possible kmers
 
     Returns:
+
     float represntaion of the linguistic complexity
     '''
     return observed/possible
@@ -114,6 +117,38 @@ def main():
         f = open(fname, "w")
         f.write(dfs[i].to_csv(index=False))
     
+
+class TestKmers(unittest.TestCase):
+    
+    def test_possiblekmers(self):
+        test_str = 'ATTTGGATT'
+        pre_comp_kmers = [4,8,7,6,5,4,3,2,1]
+        post_comp_kmers = []
+        for i in range(1, len(test_str)+1):
+            post_comp_kmers.append(get_possible_kmers(i, test_str))
+
+        self.assertEqual(pre_comp_kmers, post_comp_kmers)
+
+    def test_observedkmers(self):
+        test_str = 'ATTTGGATT'
+        pre_comp_kmers = [3,5,6,6,5,4,3,2,1]
+        post_comp_kmers = []
+        for i in range(1, len(test_str)+1):
+            post_comp_kmers.append(len(get_observed_kmers(i, test_str)))
+
+        self.assertEqual(pre_comp_kmers, post_comp_kmers)
+
+    def test_linguisticcomplexity(self):
+        test_str = 'ATTTGGATT'
+        pre_comp_lc = 0.875
+        post_comp_kmers_o = []
+        post_comp_kmers_p = []
+        for i in range(1, len(test_str)+1):
+            post_comp_kmers_p.append(get_possible_kmers(i, test_str))
+            post_comp_kmers_o.append(len(get_observed_kmers(i, test_str)))
+        post_calc_lc = calc_linguistic_comp(sum(post_comp_kmers_o), sum(post_comp_kmers_p))
+        self.assertEqual(pre_comp_lc, post_calc_lc)
+
 
 if __name__ == "__main__":
     main()
